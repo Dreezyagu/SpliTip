@@ -21,6 +21,7 @@ class SplitipCubit extends Cubit<SplitipState> {
           break;
         case 3:
           emit(SplitipQuestion3());
+
           break;
         case 4:
           emit(SplitipResult());

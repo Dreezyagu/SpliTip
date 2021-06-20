@@ -5,6 +5,7 @@ import 'package:share/share.dart';
 import 'package:splitip/Utils/constants.dart';
 import 'package:splitip/Utils/extensions.dart';
 import 'package:splitip/Utils/spaces.dart';
+import 'package:splitip/answermodel.dart';
 import 'package:splitip/cubit/splitip_cubit.dart';
 
 class Homepage extends StatefulWidget {
@@ -224,12 +225,10 @@ class Answer extends StatelessWidget {
   Answer({required this.bill, required this.people, required this.tip});
   @override
   Widget build(BuildContext context) {
-    double peopleI = double.parse(people);
-    double billI = double.parse(bill);
-    double tipI = double.parse(tip);
-    double waitersTip = (tipI / 100) * billI;
-    double total = waitersTip + billI;
-    double eachBill = total / peopleI;
+    Answermodel answermodel = Functions.calculate(
+        bill: double.parse(bill),
+        people: int.parse(people),
+        tip: double.parse(tip));
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -239,7 +238,7 @@ class Answer extends StatelessWidget {
           Row(
             children: [
               Text1('Bill'),
-              Text2(billI),
+              Text2(answermodel.bill),
             ],
           ),
           Divider(
@@ -248,7 +247,7 @@ class Answer extends StatelessWidget {
           Row(
             children: [
               Text1("Total Person(s)"),
-              Text2(peopleI),
+              Text2(double.parse(answermodel.people.toString())),
             ],
           ),
           Divider(
@@ -257,7 +256,7 @@ class Answer extends StatelessWidget {
           Row(
             children: [
               Text1("Total Bill (with tip)"),
-              Text2(total),
+              Text2(answermodel.totalBill),
             ],
           ),
           Divider(
@@ -266,7 +265,7 @@ class Answer extends StatelessWidget {
           Row(
             children: [
               Text1("Waiter's Tip"),
-              Text2(waitersTip),
+              Text2(answermodel.waitersTip),
             ],
           ),
           Divider(
@@ -275,7 +274,7 @@ class Answer extends StatelessWidget {
           Row(
             children: [
               Text1("Each Person(s) Pays"),
-              Text2(eachBill),
+              Text2(answermodel.eachBill),
             ],
           ),
           Divider(
@@ -285,7 +284,7 @@ class Answer extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               Share.share(
-                "Bill:    ${billI.round()} \nTotal Person(s):    ${peopleI.round()} \nTotal Bill (with tip):    ${total.round()} \nWaiter's Tip:    ${waitersTip.round()} \nEach Person(s) Pays:    ${eachBill.round()}"
+                "Bill:    ${answermodel.bill.round()} \nTotal Person(s):    ${answermodel.people.round()} \nTotal Bill (with tip):    ${answermodel.totalBill.round()} \nWaiter's Tip:    ${answermodel.waitersTip.round()} \nEach Person(s) Pays:    ${answermodel.eachBill.round()}"
                     .replaceAllMapped(
                         new RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
                         (Match m) => '${m[1]},'),
@@ -337,5 +336,21 @@ class Text1 extends StatelessWidget {
             fontSize: context.width(.045), fontWeight: FontWeight.w700),
       ),
     );
+  }
+}
+
+class Functions {
+  static Answermodel calculate(
+      {required int people, required double bill, required double tip}) {
+    var waitersTip = (tip / 100) * bill;
+    var total = waitersTip + bill;
+    var each = total / people;
+    return Answermodel(
+        people: people,
+        bill: bill,
+        tipPercent: tip,
+        waitersTip: waitersTip,
+        totalBill: total,
+        eachBill: each);
   }
 }
